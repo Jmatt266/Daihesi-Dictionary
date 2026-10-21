@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daihesi — Dictionary &amp; Translator</title>
+<link rel="icon" type="image/png" href="__FAVICON_DATA_URI__">
+<script>
+try {
+  var savedTheme = localStorage.getItem('daihesi.theme');
+  if (savedTheme === 'light' || savedTheme === 'dark') document.documentElement.setAttribute('data-theme', savedTheme);
+} catch (e) {}
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f3ead7;
+  --paper-2: #faf4e6;
+  --paper-3: #e9dcc2;
+  --ink: #1b1612;
+  --ink-soft: #3c332b;
+  --muted: #5a4e43;
+  --navy: #1b2744;
+  --navy-fill: #1b2744;
+  --oxblood: #6e1f2c;
+  --entry: #6e1f2c;
+  --gold: #8a6828;
+  --gold-2: #c6a35a;
+  --gold-on-navy: #f6e8c8;
+  --stamp: #6e1f2c;
+  --stamp-ink: #fff8ee;
+  --rule: rgba(27, 22, 18, .72);
+  --rule-soft: rgba(27, 22, 18, .18);
+  --miss: #8c1f1f;
+  --ok: #1c5a36;
+  --blue: #1d3f72;
+  --comp: #5b3b74;
+  --focus: #1b2744;
+  --shadow: 2px 2px 0 #1b1612;
+  --serif: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", "Times New Roman", Times, serif;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #10131a;
+  --paper-2: #181c27;
+  --paper-3: #242a3a;
+  --ink: #f3ead8;
+  --ink-soft: #e6d9c4;
+  --muted: #b7ad9e;
+  --navy: #d7e0f2;
+  --navy-fill: #2c3b5c;
+  --oxblood: #f0c3c6;
+  --entry: #f0d48a;
+  --gold: #e4c98a;
+  --gold-2: #f0ddb0;
+  --gold-on-navy: #f6e8c8;
+  --stamp: #8e3140;
+  --stamp-ink: #fff8ee;
+  --rule: rgba(228, 201, 138, .5);
+  --rule-soft: rgba(243, 234, 216, .16);
+  --miss: #ffb4ae;
+  --ok: #9ed7b6;
+  --blue: #c5d4f5;
+  --comp: #e4cbf6;
+  --focus: #e4c98a;
+  --shadow: 2px 2px 0 #000;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #10131a;
+    --paper-2: #181c27;
+    --paper-3: #242a3a;
+    --ink: #f3ead8;
+    --ink-soft: #e6d9c4;
+    --muted: #b7ad9e;
+    --navy: #d7e0f2;
+    --navy-fill: #2c3b5c;
+    --oxblood: #f0c3c6;
+    --entry: #f0d48a;
+    --gold: #e4c98a;
+    --gold-2: #f0ddb0;
+    --gold-on-navy: #f6e8c8;
+    --stamp: #8e3140;
+    --stamp-ink: #fff8ee;
+    --rule: rgba(228, 201, 138, .5);
+    --rule-soft: rgba(243, 234, 216, .16);
+    --miss: #ffb4ae;
+    --ok: #9ed7b6;
+    --blue: #c5d4f5;
+    --comp: #e4cbf6;
+    --focus: #e4c98a;
+    --shadow: 2px 2px 0 #000;
+  }
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 8% -10%, rgba(255, 250, 240, .45), transparent 42%),
+    radial-gradient(ellipse at 110% 110%, rgba(110, 31, 44, .05), transparent 38%),
+    repeating-linear-gradient(0deg, rgba(70, 42, 18, .035) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(70, 42, 18, .025) 0 1px, transparent 1px 5px);
+  color: var(--ink);
+  font: 17px/1.55 var(--serif);
+}
+html[data-theme="dark"] body {
+  background-image:
+    radial-gradient(ellipse at 12% -8%, rgba(228, 201, 138, .07), transparent 40%),
+    radial-gradient(ellipse at 100% 100%, rgba(142, 49, 64, .18), transparent 46%),
+    repeating-linear-gradient(0deg, rgba(255, 248, 235, .025) 0 1px, transparent 1px 4px);
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) body {
+    background-image:
+      radial-gradient(ellipse at 12% -8%, rgba(228, 201, 138, .07), transparent 40%),
+      radial-gradient(ellipse at 100% 100%, rgba(142, 49, 64, .18), transparent 46%),
+      repeating-linear-gradient(0deg, rgba(255, 248, 235, .025) 0 1px, transparent 1px 4px);
+  }
+}
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.skip {
+  position: absolute; left: 12px; top: -48px; z-index: 80;
+  background: var(--ink); color: var(--paper); padding: 8px 12px; text-decoration: none;
+}
+.skip:focus { top: 8px; }
+.sheet { max-width: 1080px; margin: 0 auto; padding: 18px 22px 48px; }
+.mast { position: relative; text-align: center; padding-top: 4px; }
+.mast-tools { position: absolute; top: 0; right: 0; }
+.masthead-rule {
+  height: 7px; margin: 0 0 16px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 3px double var(--ink);
+}
+.kicker {
+  margin: 0; font-variant: small-caps; letter-spacing: .34em;
+  font-size: .78rem; color: var(--oxblood);
+}
+.seal {
+  display: inline-block; margin: 10px auto 2px; padding: 3px; line-height: 0;
+  background: #140f08; border: 1px solid var(--gold-2);
+  box-shadow: 0 0 0 4px var(--paper), 0 0 0 5px var(--gold);
+}
+.crest { display: block; height: 108px; width: auto; }
+h1.title {
+  margin: 8px 0 0; font-weight: 500; line-height: .9;
+  font-size: clamp(2.6rem, 7vw, 4.6rem);
+  letter-spacing: .26em; text-indent: .26em; color: var(--ink);
+}
+.sub {
+  margin: 8px 0 0; font-variant: small-caps; letter-spacing: .22em;
+  font-size: .98rem; color: var(--ink-soft);
+}
+.ornament {
+  display: flex; align-items: center; gap: 12px;
+  width: min(420px, 88%); margin: 12px auto 0;
+}
+.ornament::before, .ornament::after {
+  content: ""; flex: 1; height: 4px;
+  border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+}
+.ornament span {
+  width: 8px; height: 8px; background: var(--oxblood); transform: rotate(45deg);
+}
+.edition { margin: 8px 0 0; font-style: italic; color: var(--muted); font-size: .98rem; }
+.tabs {
+  position: sticky; top: 0; z-index: 20;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  margin: 18px 0 8px; padding: 10px 0 12px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule-soft);
+}
+.tabs button {
+  font-family: var(--serif); font-variant: small-caps; letter-spacing: .14em;
+  font-size: 1rem; min-height: 46px; cursor: pointer;
+  background: var(--paper-2); color: var(--ink);
+  border: 1px solid var(--ink); border-radius: 1px;
+  box-shadow: var(--shadow);
+}
+.tabs button:hover { background: var(--paper-3); }
+.tabs button:active { transform: translate(1px, 1px); box-shadow: none; }
+.tabs button[aria-selected="true"] {
+  background: var(--navy-fill); color: var(--gold-on-navy);
+  border-color: var(--gold-2);
+  box-shadow: inset 0 0 0 1px var(--gold-2);
+}
+.view { display: none; padding: 8px 0 8px; }
+.view.active { display: block; }
+.btn {
+  appearance: none; font-family: var(--serif); font-variant: small-caps;
+  letter-spacing: .08em; font-size: .92rem; line-height: 1.1;
+  background: var(--paper-2); color: var(--ink);
+  border: 1px solid var(--ink); border-radius: 1px;
+  min-height: 36px; padding: .5rem .7rem; cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.btn:hover { background: var(--paper-3); }
+.btn:active { transform: translate(1px, 1px); box-shadow: none; }
+.btn.tiny { min-height: 30px; padding: .28rem .5rem; font-size: .78rem; letter-spacing: .06em; box-shadow: 1px 1px 0 var(--ink); }
+.btn.primary { background: var(--stamp); color: var(--stamp-ink); border-color: var(--stamp); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; box-shadow: none; }
+.btn[disabled] { opacity: .4; cursor: default; }
+.field-label, .recent-label, .colhead span, .try {
+  font-variant: small-caps; letter-spacing: .14em; font-size: .78rem; color: var(--muted);
+}
+.field-label { display: block; margin-bottom: 4px; }
+.searchbar { display: flex; gap: 8px; align-items: stretch; }
+.searchbar input, textarea {
+  font-family: var(--serif); color: var(--ink); background: var(--paper-2);
+  border: none; border-bottom: 2px solid var(--ink); border-radius: 0;
+}
+.searchbar input { flex: 1; font-size: 1.2rem; padding: 10px 2px; min-width: 0; }
+textarea {
+  width: 100%; min-height: 168px; resize: vertical; font-size: 1.12rem;
+  line-height: 1.5; padding: 12px; border: 1px solid var(--ink);
+}
+.hint { color: var(--muted); font-size: .92rem; margin: 8px 0 0; }
+kbd { font-family: var(--serif); border: 1px solid var(--rule); padding: 0 .35rem; font-size: .85em; }
+.posbar, .letters, .chips, .examples, .gnav, .legend {
+  display: flex; gap: 6px; align-items: center;
+}
+.posbar, .letters { flex-wrap: nowrap; overflow-x: auto; padding: 10px 2px 6px; scrollbar-width: thin; }
+.chip, .letters button { flex-shrink: 0; }
+.letters { gap: 4px; }
+.chip, .letters button {
+  flex: 0 0 auto; font-family: var(--serif); cursor: pointer;
+  background: transparent; color: var(--ink); border: 1px solid var(--rule);
+  border-radius: 1px;
+}
+.chip { font-variant: small-caps; letter-spacing: .05em; font-size: .82rem; min-height: 32px; padding: 0 .55rem; }
+.letters button { width: 2.15rem; height: 2.15rem; padding: 0; font-size: 1rem; }
+.chip[aria-pressed="true"], .letters button[aria-pressed="true"] {
+  background: var(--navy-fill); color: var(--gold-on-navy); border-color: var(--navy-fill);
+}
+.letters button:disabled { opacity: .32; cursor: default; }
+.recent { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.status { color: var(--muted); font-size: .95rem; margin: 12px 0; min-height: 1.4em; }
+.lexicon { display: grid; grid-template-columns: 1fr 1fr; gap: 0 36px; }
+.entry { border-top: 1px solid var(--rule-soft); padding: 14px 2px 16px; }
+.entry.target { box-shadow: inset 3px 0 0 var(--gold); padding-left: 10px; }
+.entry-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 12px; align-items: flex-start; }
+.head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; min-width: 0; }
+.hw { margin: 0; font-size: 1.55rem; font-weight: 600; color: var(--entry); letter-spacing: .01em; line-height: 1.15; }
+.pron { color: var(--muted); font-style: italic; font-size: .95rem; }
+.entry-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.pos {
+  display: inline-block; font-variant: small-caps; letter-spacing: .08em;
+  font-size: .74rem; color: var(--navy); border: 1px solid var(--rule-soft);
+  padding: 0 .4rem; margin-right: .25rem; vertical-align: 1px;
+}
+.sense { margin: 8px 0 0; }
+.gloss { margin: 10px 0 0; padding-top: 8px; border-top: 1px dashed var(--rule-soft); }
+.gloss small, .en-label {
+  font-variant: small-caps; letter-spacing: .14em; color: var(--muted);
+  font-size: .72rem; margin-right: .4rem;
+}
+mark { background: rgba(198, 163, 90, .38); color: inherit; padding: 0 .05em; }
+.saved { margin: 4px 0 12px; }
+.saved h2, .gsec h3, .wotd .label {
+  font-variant: small-caps; letter-spacing: .16em; font-weight: 600;
+  font-size: .8rem; margin: 0 0 8px; color: var(--oxblood);
+}
+.wotd {
+  border: 1px solid var(--ink); outline: 1px solid var(--gold-2); outline-offset: -7px;
+  padding: 22px 16px 14px; margin: 6px 0 8px; background: var(--paper-2);
+}
+.wotd .hw { font-size: 2rem; }
+.wotd-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.empty {
+  margin: 12px 4px; padding: 28px 16px; text-align: center;
+  border: 1px solid var(--ink); outline: 1px solid var(--rule); outline-offset: 4px;
+}
+.empty p { margin: 0 0 12px; }
+.empty .actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.notice {
+  border: 1px solid var(--rule-soft); border-left: 3px solid var(--oxblood);
+  background: var(--paper-2); padding: 10px 14px; margin: 0 0 14px; font-size: .98rem;
+}
+.tr-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.dir { display: flex; align-items: center; gap: 10px; }
+.lang { font-variant: small-caps; letter-spacing: .14em; font-size: 1.15rem; min-width: 5.5rem; text-align: center; color: var(--entry); }
+.tr-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.colhead { min-height: 32px; display: flex; justify-content: space-between; align-items: center; margin: 0 0 6px; }
+.out {
+  min-height: 168px; background: var(--paper-2); border: 1px solid var(--ink);
+  padding: 12px; font-size: 1.12rem; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.out .miss { color: var(--miss); text-decoration: underline dotted; text-underline-offset: 3px; }
+.out .der { border-bottom: 1px dashed var(--blue); }
+.examples { flex-wrap: wrap; margin-top: 12px; }
+.legend { flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: .85rem; margin: 12px 0 4px; }
+.legend span::before {
+  content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: 0;
+  border: 1px solid currentColor;
+}
+.k-dict { color: var(--ok); } .k-gram { color: var(--gold); } .k-comp { color: var(--comp); }
+.k-der { color: var(--blue); } .k-miss { color: var(--miss); }
+.tablewrap { overflow-x: auto; margin-top: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+th, td { text-align: left; padding: 8px 10px; vertical-align: top; }
+th {
+  font-variant: small-caps; letter-spacing: .1em; font-weight: 600; font-size: .78rem;
+  border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); color: var(--ink);
+}
+td { border-bottom: 1px solid var(--rule-soft); }
+.how { font-variant: small-caps; letter-spacing: .04em; font-size: .75rem; border: 1px solid currentColor; padding: 0 .4rem; white-space: nowrap; }
+.how.dict { color: var(--ok); } .how.gram { color: var(--gold); } .how.comp { color: var(--comp); }
+.how.der { color: var(--blue); } .how.miss { color: var(--miss); }
+.detail { color: var(--muted); font-size: .9rem; }
+.linkish {
+  background: none; border: none; padding: 0; color: var(--entry); cursor: pointer;
+  font: inherit; text-decoration: underline dotted; text-underline-offset: 3px;
+}
+.gloss-panel { margin-top: 18px; border-top: 3px double var(--ink); padding-top: 8px; }
+.gnav { flex-wrap: wrap; margin: 4px 0 16px; }
+.gsec { margin: 0 0 28px; scroll-margin-top: 84px; }
+.gsec h2 {
+  font-weight: 500; font-size: 1.55rem; letter-spacing: .14em; font-variant: small-caps;
+  margin: 0 0 12px; padding-bottom: 6px; border-bottom: 3px double var(--ink);
+}
+.gsec h3 { font-size: 1.05rem; margin: 16px 0 6px; }
+.gblock { padding: 4px 0 8px; }
+.cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 28px; }
+.mono { font-variant: small-caps; letter-spacing: .04em; color: var(--entry); }
+.dai { font-size: 1.15rem; color: var(--entry); }
+footer {
+  margin-top: 28px; padding-top: 12px; border-top: 3px double var(--ink);
+  text-align: center; color: var(--muted); font-size: .88rem; font-style: italic;
+}
+.toast {
+  position: fixed; left: 50%; bottom: 20px; z-index: 50;
+  transform: translateX(-50%);
+  background: var(--ink); color: var(--paper);
+  border: 1px solid var(--gold-2); padding: 8px 16px;
+  font-variant: small-caps; letter-spacing: .08em;
+  opacity: 0; pointer-events: none; transition: opacity .18s ease;
+}
+.toast.show { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .toast { transition: none; }
+  html { scroll-behavior: auto; }
+}
+@media (max-width: 800px) {
+  .lexicon, .tr-cols, .cols2 { grid-template-columns: 1fr; }
+  .sheet { padding: 12px 14px 36px; }
+  .mast-tools { position: static; display: flex; justify-content: flex-end; margin-bottom: 8px; }
+  .crest { height: 86px; }
+  h1.title { letter-spacing: .14em; text-indent: .14em; }
+  .kicker { letter-spacing: .18em; }
+  .sub { letter-spacing: .12em; }
+  .tabs button { letter-spacing: .08em; font-size: .92rem; padding: 8px 4px; }
+  .wotd .hw { font-size: 1.7rem; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="sheet">
+<header class="mast">
+  <div class="masthead-rule" aria-hidden="true"></div>
+  <div class="mast-tools">
+    <button type="button" class="btn tiny" id="theme" aria-pressed="false">Evening edition</button>
+  </div>
+  <p class="kicker">Daihesilend · National Lexicon</p>
+  <div class="seal"><img class="crest" src="__LOGO_DATA_URI__" alt="Hakelimebel, the golden eagle of Daihesilend" width="264" height="220"></div>
+  <h1 class="title">Daihesi</h1>
+  <p class="sub">Dictionary &amp; Translator</p>
+  <div class="ornament" aria-hidden="true"><span></span></div>
+  <p class="edition">A lexicon of the language of Daihesilend</p>
+</header>
+<nav class="tabs" id="tabs" role="tablist" aria-label="Sections">
+  <button type="button" role="tab" id="tab-dictionary" data-view="dictionary" aria-selected="true" aria-controls="view-dictionary">Dictionary</button>
+  <button type="button" role="tab" id="tab-translator" data-view="translator" aria-selected="false" aria-controls="view-translator" tabindex="-1">Translator</button>
+  <button type="button" role="tab" id="tab-grammar" data-view="grammar" aria-selected="false" aria-controls="view-grammar" tabindex="-1">Grammar</button>
+</nav>
+<main id="main">
+<section class="view active" id="view-dictionary" role="tabpanel" aria-labelledby="tab-dictionary">
+  <div class="panel">
+    <label class="field-label" for="q">Search the lexicon</label>
+    <div class="searchbar">
+      <input id="q" type="search" placeholder="Daihesi or English…" autocomplete="off" spellcheck="false" aria-label="Search the dictionary" aria-keyshortcuts="/" enterkeyhint="search">
+      <button type="button" class="btn" id="clear-q" hidden>Clear</button>
+    </div>
+    <p class="hint">Both directions. Accents and capitals are optional: <b>astar</b> finds <b>Astár</b>, <b>tervos</b> finds <b>Tervos</b>. Press <kbd>/</kbd> to search.</p>
+    <div class="posbar" id="posbar" role="toolbar" aria-label="Filter by part of speech"></div>
+    <div class="letters" id="letters" role="toolbar" aria-label="Browse by letter"></div>
+    <div class="recent" id="recent" hidden></div>
+  </div>
+  <div id="saved-slot"></div>
+  <div id="wotd-slot"></div>
+  <p class="status" id="status" role="status"></p>
+  <div class="lexicon" id="results"></div>
+  <div class="empty" id="empty" hidden></div>
+</section>
+<section class="view" id="view-translator" role="tabpanel" aria-labelledby="tab-translator" hidden>
+  <div class="notice"><b>Word by word.</b> Each word is looked up on its own in the lexicon, the grammar tables, the compounds, and the affix rules. Word order and idioms are left as written. Read the gloss, and treat the line as a draft.</div>
+  <div class="tr-head">
+    <div class="dir">
+      <span class="lang" id="lang-from">English</span>
+      <button type="button" class="btn" id="swap" aria-label="Swap direction">Swap</button>
+      <span class="lang" id="lang-to">Daihesi</span>
+    </div>
+    <button type="button" class="btn" id="clear">Clear</button>
+  </div>
+  <div class="tr-cols">
+    <div>
+      <div class="colhead"><span id="in-label">English</span></div>
+      <textarea id="tin" placeholder="Type or paste a line…" spellcheck="false" aria-label="Text to translate"></textarea>
+    </div>
+    <div>
+      <div class="colhead"><span id="out-label">Daihesi</span><button type="button" class="btn tiny primary" id="copy">Copy</button></div>
+      <div class="out" id="tout" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="examples" id="examples"></div>
+  <div class="legend">
+    <span class="k-dict">dictionary</span>
+    <span class="k-gram">grammar table</span>
+    <span class="k-comp">compound</span>
+    <span class="k-der">affix</span>
+    <span class="k-miss">not found</span>
+  </div>
+  <div class="gloss-panel">
+    <div class="colhead"><span>Word-by-word gloss</span><span id="tstats"></span></div>
+    <div class="tablewrap">
+      <table class="gloss">
+        <thead><tr><th>Source</th><th>Output</th><th>How</th><th>Details</th></tr></thead>
+        <tbody id="gloss"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<section class="view" id="view-grammar" role="tabpanel" aria-labelledby="tab-grammar" hidden>
+  <div class="gnav" id="gnav" role="navigation" aria-label="Grammar sections"></div>
+  <div id="gbody"></div>
+</section>
+<noscript><p class="notice">The lexicon is stored in this page. JavaScript is required to search and translate.</p></noscript>
+</main>
+<footer id="foot"></footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script id="daihesi-data" type="application/json">__DAIHESI_DATA_JSON__</script>
+<script>
+(function(){
+"use strict";
+const D = JSON.parse(document.getElementById('daihesi-data').textContent);
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[\u2019\u2018`\u00b4\u02bc]/g, "'");
+const VOWELS = 'aeiouy';
+const isVowelEnd = s => VOWELS.includes(norm(s).slice(-1));
+const E = D.entries; E.forEach((e, i) => { e.id = i; e.nh = norm(e.h); e.nen = e.en.map(norm); });
+
+/* ------------------------------------------------------------------ indexes */
+const daIndex = new Map();        // norm headword -> entries
+E.forEach(e => push(daIndex, e.nh, e));
+function push(m, k, v){ if (!m.has(k)) m.set(k, []); m.get(k).push(v); }
+
+const enIndex = new Map();        // norm english term -> [{kind, da, entry, score, src}]
+const enPhrase = new Map();       // multi-word english -> same
+const daPhrase = new Map();       // multi-word / compound daihesi -> {en, raw}
+const funcRev = new Map();        // norm daihesi function word -> {en, src}
+function addEn(term, cand){
+  const k = norm(term).trim(); if (!k) return;
+  push(k.includes(' ') ? enPhrase : enIndex, k, cand);
+}
+D.func.forEach(f => {
+  addEn(f.en, {kind:'gram', da:f.da, score:0, src:f.src});
+  const k = norm(f.da); if (!funcRev.has(k)) funcRev.set(k, f);
+});
+E.forEach(e => {
+  const notes = norm(e.n.join(' '));
+  let pen = 0;
+  if (/old|poetic|archaic/.test(notes)) pen += 6;
+  if (/formal|scriptur/.test(notes)) pen += 3;
+  if (/informal|short|combining/.test(notes)) pen += 1;
+  if (e.pos.includes('contraction')) pen += 2;
+  e.en.forEach((t, i) => addEn(t, {kind:'dict', da:e.h, entry:e, score:10 + i * 2 + pen}));
+});
+D.compounds.forEach(c => {
+  c.en.forEach(en => { if (en) addEn(en, {kind:'comp', da:c.da[c.da.length > 1 ? 1 : 0], score:-1, raw:c.raw}); });
+  c.da.forEach(d => daPhrase.set(norm(d), {en:c.en[0], raw:c.raw, alts:c.en.slice(1)}));
+});
+for (const m of [enIndex, enPhrase]) for (const v of m.values()) v.sort((a, b) => a.score - b.score);
+const MAX_EN_PHRASE = Math.max(1, ...[...enPhrase.keys()].map(k => k.split(' ').length));
+const MAX_DA_PHRASE = Math.max(1, ...[...daPhrase.keys()].map(k => k.split(' ').length));
+
+/* --------------------------------------------------------- english helpers */
+const IRR = 'arise arose|awake awoke|be was|bear bore|beat beat|become became|begin began|bend bent|bind bound|bite bit|bleed bled|blow blew|break broke|bring brought|build built|burn burnt|buy bought|catch caught|choose chose|come came|cost cost|cut cut|deal dealt|dig dug|do did|draw drew|dream dreamt|drink drank|drive drove|eat ate|fall fell|feed fed|feel felt|fight fought|find found|flee fled|fly flew|forbid forbade|forget forgot|forgive forgave|freeze froze|get got|give gave|go went|grow grew|hang hung|have had|hear heard|hide hid|hit hit|hold held|hurt hurt|keep kept|know knew|lay laid|lead led|leave left|lend lent|let let|lie lay|light lit|lose lost|make made|mean meant|meet met|pay paid|put put|read read|ride rode|ring rang|rise rose|run ran|say said|see saw|seek sought|sell sold|send sent|set set|shake shook|shine shone|shoot shot|shut shut|sing sang|sink sank|sit sat|sleep slept|slay slew|speak spoke|spend spent|stand stood|steal stole|stick stuck|strike struck|swear swore|swim swam|take took|teach taught|tear tore|tell told|think thought|throw threw|understand understood|wake woke|wear wore|weep wept|win won|write wrote'
+  .split('|').map(p => p.split(' '));
+const PAST_OF = new Map(IRR.map(([b, p]) => [b, p]));
+const BASE_OF_PAST = new Map(IRR.filter(([b, p]) => b !== p || true).map(([b, p]) => [p, b]));
+['gone go','done do','seen see','given give','taken take','written write','spoken speak','fallen fall','known know','risen rise','chosen choose','broken break','forgotten forget','eaten eat','flown fly','grown grow','driven drive','hidden hide','stolen steal','sworn swear','torn tear','worn wear','won win','begun begin','sung sing','swum swim','drunk drink'].forEach(p => { const [a, b] = p.split(' '); BASE_OF_PAST.set(a, b); });
+const IRR_PL = new Map('man men|woman women|child children|person people|foot feet|tooth teeth|mouse mice|goose geese|life lives|wife wives|knife knives|leaf leaves|wolf wolves|half halves|ox oxen'.split('|').map(p => p.split(' ')));
+const SING_OF = new Map([...IRR_PL].map(([a, b]) => [b, a]));
+const NUM_TEEN = {one:'eleven',two:'twelve',three:'thirteen',four:'fourteen',five:'fifteen',six:'sixteen',seven:'seventeen',eight:'eighteen',nine:'nineteen'};
+const NUM_TENS = {two:'twenty',three:'thirty',four:'forty',five:'fifty',six:'sixty',seven:'seventy',eight:'eighty',nine:'ninety'};
+const NUM_ORD = {one:'first',two:'second',three:'third',four:'fourth',five:'fifth',six:'sixth',seven:'seventh',eight:'eighth',nine:'ninth',ten:'tenth'};
+function onFirst(w, f){ const i = w.indexOf(' '); return i < 0 ? f(w) : f(w.slice(0, i)) + w.slice(i); }
+const cy = w => /[^aeiou]y$/.test(w);
+const enPast = w => onFirst(w, x => PAST_OF.get(x.toLowerCase()) || (x.endsWith('e') ? x + 'd' : cy(x) ? x.slice(0, -1) + 'ied' : x + 'ed'));
+const en3 = w => onFirst(w, x => ({have:'has', do:'does', go:'goes', be:'is'})[x.toLowerCase()] || (/(s|x|z|ch|sh)$/.test(x) ? x + 'es' : cy(x) ? x.slice(0, -1) + 'ies' : x + 's'));
+const enPl = w => onFirst(w, x => IRR_PL.get(x.toLowerCase()) || (/(s|x|z|ch|sh)$/.test(x) ? x + 'es' : cy(x) ? x.slice(0, -1) + 'ies' : x + 's'));
+const enIng = w => onFirst(w, x => /ie$/.test(x) ? x.slice(0, -2) + 'ying' : (/[^e]e$/.test(x) ? x.slice(0, -1) + 'ing' : x + 'ing'));
+const ySwap = (x, suf) => cy(x) ? x.slice(0, -1) + 'i' + suf : x + suf;
+const EN_INFLECT = {
+  PAST: enPast, PRES: en3, PL: enPl, PLON: enPl, ING: enIng, VN: enIng,
+  EST: w => onFirst(w, x => x.endsWith('e') ? x + 'st' : ySwap(x, 'est')),
+  NESS: w => onFirst(w, x => ySwap(x, 'ness')), LESS: w => onFirst(w, x => ySwap(x, 'less')),
+  LY: w => onFirst(w, x => /le$/.test(x) ? x.slice(0, -1) + 'y' : ySwap(x, 'ly')),
+  ER: w => onFirst(w, x => x.endsWith('e') ? x + 'r' : x + 'er'), AGENT: w => onFirst(w, x => x.endsWith('e') ? x + 'r' : x + 'er'),
+  CMP: w => onFirst(w, x => x.endsWith('e') ? x + 'r' : ySwap(x, 'er')),
+  POL: w => 'please ' + w, ADJ: w => w + ' (adj.)', RE: w => 're' + w, UN: w => 'un' + w, WITHOUT: w => onFirst(w, x => ySwap(x, 'less')),
+  LAND: w => 'land of ' + w, IAN: w => w + 'ian', MIL: w => w + ' (military)', RANK: w => w + ' (rank)', HEAD: w => 'head of ' + w,
+  MALE: w => 'male ' + w, FEMALE: w => 'female ' + w, EN: w => w + 'en', PP: w => (BASE_OF_PAST.has(w) ? w : enPast(w)),
+  TEEN: w => NUM_TEEN[w.toLowerCase()] || w + '-teen', TENS: w => NUM_TENS[w.toLowerCase()] || w + '-ty', ORD: w => NUM_ORD[w.toLowerCase()] || w + 'th'
+};
+const TAG_LABEL = {PAST:'-ti past tense', PRES:'-ra present tense', PL:'plural', PLON:'-er plural of -ön', ING:'-uis participle (-ing)', VN:'-adur verbal noun (-ing)',
+  EST:'-aast superlative', NESS:'-niss (-ness)', LESS:'-laj (-less)', LY:'-ia (-ly)', ER:'-ür agent (-er)', AGENT:'-ön person', CMP:'-ar comparative',
+  POL:'-id polite / command', ADJ:'-i adjective', RE:'Zá- again (re-)', UN:'En- un-/in-', WITHOUT:'Ze- lacking', LAND:'land of', IAN:'-ijan people of',
+  MIL:'-gros military title', RANK:'-rias rank', HEAD:'-kommend head of', MALE:'-ur male', FEMALE:'-in female', EN:'-na (-en)', PP:'-os past participle',
+  TEEN:'-ipanste teens', TENS:'-ven tens', ORD:'-ema ordinal'};
+
+/* -------------------------------------------------------- daihesi affixes */
+const daPlural = h => /ön$/.test(h) ? h.slice(0, -2) + 'er' : isVowelEnd(h) ? h + 's' : h + 'os';
+const daPast = h => /ti$/.test(norm(h)) ? h : (/a$/.test(norm(h)) && h.length > 3 ? h.slice(0, -1) + 'ti' : h + 'ti');
+const DA_APPLY = {
+  PL: daPlural, PRES: h => /ra$/.test(norm(h)) ? h : (/a$/.test(norm(h)) && h.length > 3 ? h.slice(0, -1) + 'ra' : h + 'ra'), PAST: daPast, ING: h => h + 'uis', LY: h => h + 'ia', NESS: h => h + 'niss', LESS: h => h + 'laj',
+  EST: h => h + 'aast', AGENT: h => h + 'ür', CMP: h => h + 'ar', PP: h => h + 'os'
+};
+const DA_SUF = [['ipanste','TEEN'],['kommend','HEAD'],['aast','EST'],['niss','NESS'],['adur','VN'],['ijan','IAN'],['lend','LAND'],['gros','MIL'],['rias','RANK'],
+  ['ema','ORD'],['ven','TENS'],['ija','LAND'],['uis','ING'],['laj','LESS'],['ti','PAST'],['ra','PRES'],['os','PL'],['ar','PL'],['er','PLON'],['ür','ER'],
+  ['ia','LY'],['id','POL'],['ön','AGENT'],['ur','MALE'],['in','FEMALE'],['na','EN'],['s','PL'],['i','ADJ']];
+const DA_PRE = [['záce','RE'],['zá','RE'],['ze','WITHOUT'],['en','UN']];
+
+/* ------------------------------------------------------------- tokenizing */
+const WORD_RE = /(\p{L}[\p{L}\p{M}]*(?:['\u2019]\p{L}[\p{L}\p{M}]*)*)|([^\p{L}]+)/gu;
+function tokenize(text){
+  const out = []; let m; WORD_RE.lastIndex = 0;
+  while ((m = WORD_RE.exec(text))) out.push(m[1] ? {w:true, s:m[1]} : {w:false, s:m[2]});
+  return out;
+}
+function applyCase(src, out, keep){
+  if (!out) return out;
+  if (src.length > 1 && src === src.toUpperCase() && /\p{Lu}/u.test(src)) return out.toUpperCase();
+  if (/^\p{Lu}/u.test(src)) return out.charAt(0).toUpperCase() + out.slice(1);
+  if (keep) return out;
+  return out.charAt(0).toLowerCase() + out.slice(1);
+}
+// group word tokens into phrases: returns [{words:[tok...], seps:[...]}]
+function phraseKeyAt(toks, i, n){
+  const words = [], idx = []; let j = i;
+  while (j < toks.length && words.length < n){
+    if (toks[j].w){ words.push(toks[j].s); idx.push(j); j++; }
+    else if (words.length && /^[ \t]+$/.test(toks[j].s) && j + 1 < toks.length && toks[j + 1].w) j++;
+    else break;
+  }
+  return words.length === n ? {key: norm(words.join(' ')), end: idx[idx.length - 1]} : null;
+}
+
+/* ---------------------------------------------------------- EN -> DA */
+const EN_CONTR = {"i'm":"I am","you're":"you are","we're":"we are","they're":"they are","it's":"it is","he's":"he is","she's":"she is","who's":"who is",
+  "can't":"can not","cannot":"can not","don't":"do not","doesn't":"does not","didn't":"did not","won't":"will not","isn't":"is not","aren't":"are not",
+  "wasn't":"was not","weren't":"were not","i'll":"I will","we'll":"we will","you'll":"you will","they'll":"they will","he'll":"he will","she'll":"she will",
+  "who're":"who are","i've":"I have","we've":"we have","you've":"you have","they've":"they have","shouldn't":"should not","hasn't":"has not","haven't":"have not"};
+const DETERMINERS = new Set('the a an my your his her its our their this that these those some many all every each no two three four five six seven eight nine ten few several'.split(' '));
+const VERB_CTX = new Set('i you we they he she it who to will would can could should must may might shall do does did not never always often also'.split(' '));
+const SUBJ3 = new Set('he she it who'.split(' '));
+function bestCand(cands, prefer){
+  if (!cands || !cands.length) return null;
+  if (prefer){
+    const hit = cands.find(c => c.kind !== 'dict' || c.entry.pos.some(p => prefer.includes(p)));
+    if (hit) return hit;
+  }
+  return cands[0];
+}
+function enStems(w){
+  const c = [], add = (r, t) => { if (r.length >= 2) c.push([r, t]); };
+  if (SING_OF.has(w)) add(SING_OF.get(w), 'S');
+  if (BASE_OF_PAST.has(w)) add(BASE_OF_PAST.get(w), 'ED');
+  if (/ies$/.test(w)) add(w.slice(0, -3) + 'y', 'S');
+  if (/(s|x|z|ch|sh)es$/.test(w)) add(w.slice(0, -2), 'S');
+  if (/s$/.test(w) && !/ss$/.test(w)) add(w.slice(0, -1), 'S');
+  if (/ied$/.test(w)) add(w.slice(0, -3) + 'y', 'ED');
+  if (/ed$/.test(w)){ add(w.slice(0, -2), 'ED'); add(w.slice(0, -1), 'ED'); if (/(.)\1ed$/.test(w)) add(w.slice(0, -3), 'ED'); }
+  if (/ing$/.test(w)){ add(w.slice(0, -3), 'ING'); add(w.slice(0, -3) + 'e', 'ING'); if (/(.)\1ing$/.test(w)) add(w.slice(0, -4), 'ING'); }
+  if (/ily$/.test(w)) add(w.slice(0, -3) + 'y', 'LY');
+  if (/ly$/.test(w)) add(w.slice(0, -2), 'LY');
+  if (/iness$/.test(w)) add(w.slice(0, -5) + 'y', 'NESS');
+  if (/ness$/.test(w)) add(w.slice(0, -4), 'NESS');
+  if (/less$/.test(w)) add(w.slice(0, -4), 'LESS');
+  if (/iest$/.test(w)) add(w.slice(0, -4) + 'y', 'EST');
+  if (/est$/.test(w)){ add(w.slice(0, -3), 'EST'); add(w.slice(0, -2), 'EST'); }
+  if (/ier$/.test(w)) add(w.slice(0, -3) + 'y', 'ER');
+  if (/er$/.test(w)){ add(w.slice(0, -2), 'ER'); add(w.slice(0, -1), 'ER'); }
+  return c;
+}
+function enLookupWord(w, prevWord){
+  const k = norm(w);
+  const direct = enIndex.get(k);
+  if (direct){
+    const prefer = prevWord && DETERMINERS.has(prevWord) ? ['noun', 'adjective', 'numeral'] : (prevWord && VERB_CTX.has(prevWord) ? ['verb'] : null);
+    const c = bestCand(direct, prefer);
+    return {out:c.da, how:c.kind, cand:c, alts:direct.filter(x => x !== c && norm(x.da) !== norm(c.da)).map(x => x.da)};
+  }
+  for (const [root, t] of enStems(k)){
+    const cands = enIndex.get(root);
+    if (!cands) continue;
+    let tag, prefer;
+    if (t === 'S'){
+      const nounPrev = prevWord && DETERMINERS.has(prevWord);
+      const verbOnly = cands.every(c => c.kind === 'dict' && c.entry.pos.includes('verb') && !c.entry.pos.includes('noun'));
+      const subjPrev = prevWord && (SUBJ3.has(prevWord));
+      const hasVerb = cands.some(c => c.kind === 'dict' && c.entry.pos.includes('verb'));
+      tag = (!nounPrev && (verbOnly || (subjPrev && hasVerb))) ? 'PRES' : 'PL'; prefer = tag === 'PL' ? ['noun'] : ['verb'];
+    } else if (t === 'ED'){ tag = 'PAST'; prefer = ['verb']; }
+    else if (t === 'ING'){ tag = 'ING'; prefer = ['verb']; }
+    else if (t === 'ER'){ const adj = cands.some(c => c.kind === 'dict' && c.entry.pos.includes('adjective')); tag = adj ? 'CMP' : 'AGENT'; prefer = adj ? ['adjective'] : ['verb', 'noun']; }
+    else { tag = t; prefer = ['adjective', 'noun']; }
+    const c = bestCand(cands, prefer);
+    const da = (DA_APPLY[tag] || (h => h))(c.da);
+    return {out:da, how:'der', cand:c, root:c.da, tag, enRoot:root, alts:cands.filter(x => x !== c && norm(x.da) !== norm(c.da)).map(x => (DA_APPLY[tag] || (h => h))(x.da))};
+  }
+  return null;
+}
+function translateEnDa(text){
+  // expand English contractions first
+  const raw = tokenize(text), toks = [];
+  raw.forEach(t => {
+    const ex = t.w && EN_CONTR[norm(t.s)];
+    if (!ex) return toks.push(t);
+    const parts = ex.split(' ');
+    parts.forEach((p, i) => { if (i) toks.push({w:false, s:' '}); toks.push({w:true, s: i === 0 ? applyCase(t.s, p, p === 'I') : p, from: i === 0 ? t.s : ''}); });
+  });
+  const html = [], plain = [], rows = []; let prevWord = null, found = 0, total = 0;
+  for (let i = 0; i < toks.length; i++){
+    const t = toks[i];
+    if (!t.w){ html.push(esc(t.s)); plain.push(t.s); continue; }
+    total++;
+    let done = false;
+    for (let n = Math.min(MAX_EN_PHRASE, 6); n >= 2 && !done; n--){
+      const p = phraseKeyAt(toks, i, n);
+      if (!p || !enPhrase.has(p.key)) continue;
+      const c = enPhrase.get(p.key)[0];
+      const src = toks.slice(i, p.end + 1).map(x => x.s).join('');
+      const out = applyCase(t.s, c.da, false);
+      html.push(`<span class="${c.kind === 'comp' ? 'comp' : ''}" title="${esc(src)}">${esc(out)}</span>`); plain.push(out);
+      rows.push({src, out, how:c.kind, detail: c.kind === 'comp' ? 'Compound word: ' + c.raw : 'Phrase in dictionary', entry:c.entry});
+      found++; prevWord = norm(toks[p.end].s); i = p.end; done = true;
+    }
+    if (done) continue;
+    const r = enLookupWord(t.s, prevWord);
+    prevWord = norm(t.s);
+    if (!r){
+      html.push(`<span class="miss" title="Not in the dictionary">${esc(t.s)}</span>`); plain.push(t.s);
+      rows.push({src:t.s, out:'—', how:'miss', detail:'No match in the dictionary, grammar tables or affix rules; left as is.'});
+      continue;
+    }
+    found++;
+    const keep = r.cand.entry && r.cand.entry.pos.includes('proper noun');
+    const out = applyCase(t.s, r.out, keep);
+    html.push(`<span class="${r.how === 'der' ? 'der' : ''}">${esc(out)}</span>`); plain.push(out);
+    let detail = '';
+    if (r.how === 'der') detail = `${r.enRoot} → ${r.root} + ${TAG_LABEL[r.tag] || r.tag}`;
+    else if (r.how === 'gram') detail = 'Grammar: ' + r.cand.src;
+    else if (r.cand.entry) detail = r.cand.entry.g;
+    if (r.alts && r.alts.length) detail += (detail ? ' · ' : '') + 'also: ' + [...new Set(r.alts)].slice(0, 4).join(', ');
+    rows.push({src:t.from || t.s, out, how:r.how, detail, entry:r.cand.entry});
+  }
+  return {html:html.join(''), text:plain.join(''), rows, found, total};
+}
+
+/* ---------------------------------------------------------- DA -> EN */
+function enOf(e){
+  const t = e.en[0] || e.h;
+  return e.pos.includes('proper noun') || /^I\b/.test(t) ? t : t.charAt(0).toLowerCase() + t.slice(1);
+}
+const tidyEn = s => s.split(' ').map(w => /^I(\b|')/.test(w) ? w : w.toLowerCase()).join(' ');
+function daDirect(w){
+  const k = norm(w);
+  if (daPhrase.has(k)) return {kind:'comp', en:tidyEn(daPhrase.get(k).en), raw:daPhrase.get(k).raw};
+  if (funcRev.has(k)) return {kind:'gram', en:funcRev.get(k).en, src:funcRev.get(k).src};
+  const list = daIndex.get(k);
+  if (list){
+    const exact = list.find(e => e.h.toLowerCase() === w.toLowerCase()) || list[0];
+    return {kind:'dict', en:enOf(exact), entry:exact, alts:list.filter(x => x !== exact).map(enOf)};
+  }
+  return null;
+}
+function daDerive(w, depth){
+  const d = daDirect(w); if (d) return {...d, chain:[]};
+  if (depth >= 2) return null;
+  const k = norm(w);
+  for (const [suf, tag] of DA_SUF){
+    if (!k.endsWith(suf)) continue;
+    const stem = w.slice(0, w.length - suf.length);
+    if (norm(stem).length < (suf.length <= 1 ? 3 : 2)) continue;
+    const variants = tag === 'PLON' ? [stem + 'ön'] : [stem, stem + 'a', stem + 'e'];
+    if (tag === 'PL' && suf === 'os') variants.push(stem + 'o');
+    for (const v of variants){
+      const r = daDerive(v, depth + 1);
+      if (r && (r.kind === 'dict' || r.kind === 'gram')) return {...r, chain:[...r.chain, {tag: suf === 'os' && r.entry && r.entry.pos.includes('verb') && !r.entry.pos.includes('noun') ? 'PP' : tag, suf, root:v}]};
+    }
+  }
+  for (const [pre, tag] of DA_PRE){
+    if (!k.startsWith(pre)) continue;
+    const stem = w.slice(pre.length);
+    if (norm(stem).length < 3) continue;
+    for (const v of [stem, stem.charAt(0).toUpperCase() + stem.slice(1)]){
+      const r = daDerive(v, depth + 1);
+      if (r && r.kind === 'dict') return {...r, chain:[...r.chain, {tag, suf:pre + '-', root:v}]};
+    }
+  }
+  return null;
+}
+function daLookupWord(w){
+  const r = daDerive(w, 0);
+  if (r) return r;
+  if (/lki$/.test(norm(w)) && norm(w).length > 5){        // Jia + nölki = Jialki
+    const s = daDerive(w.slice(0, -3), 0);
+    if (s) return {kind:'contr', en: s.chain.reduce((a, c) => (EN_INFLECT[c.tag] || (x => x))(a), s.en) + ' not', parts:[w.slice(0, -3), 'nölki'], sub:[s], chain:[]};
+  }
+  if (/['\u2019]/.test(w)){
+    const parts = w.split(/['\u2019]/).filter(Boolean);
+    const sub = parts.map(p => (norm(p) === 'nol' || norm(p) === 'nolki') ? {kind:'gram', en:'not', chain:[]} : daDerive(p, 0));
+    if (sub.every(Boolean)) return {kind:'contr', en: sub.map(s => s.chain.reduce((a, c) => (EN_INFLECT[c.tag] || (x => x))(a), s.en)).join(' '), parts, sub, chain:[]};
+  }
+  return null;
+}
+function translateDaEn(text){
+  const toks = tokenize(text), html = [], plain = [], rows = []; let found = 0, total = 0, sentenceStart = true;
+  for (let i = 0; i < toks.length; i++){
+    const t = toks[i];
+    if (!t.w){ html.push(esc(t.s)); plain.push(t.s); if (/[.!?]/.test(t.s)) sentenceStart = true; continue; }
+    total++;
+    let done = false;
+    for (let n = Math.min(MAX_DA_PHRASE, 4); n >= 2 && !done; n--){
+      const p = phraseKeyAt(toks, i, n);
+      if (!p || !daPhrase.has(p.key)) continue;
+      const c = daPhrase.get(p.key), src = toks.slice(i, p.end + 1).map(x => x.s).join('');
+      const out = applyCase(t.s, tidyEn(c.en), false);
+      html.push(`<span class="comp">${esc(out)}</span>`); plain.push(out);
+      rows.push({src, out, how:'comp', detail:'Compound / phrase: ' + c.raw});
+      found++; i = p.end; done = true; sentenceStart = false;
+    }
+    if (done) continue;
+    const r = daLookupWord(t.s);
+    if (!r){
+      html.push(`<span class="miss" title="Not in the dictionary">${esc(t.s)}</span>`); plain.push(t.s);
+      rows.push({src:t.s, out:'—', how:'miss', detail:'No headword, compound or affix rule matched; left as is.'});
+      sentenceStart = false; continue;
+    }
+    found++;
+    let en = r.en;
+    r.chain.forEach(c => { en = (EN_INFLECT[c.tag] || (x => x))(en); });
+    const keep = (r.entry && r.entry.pos.includes('proper noun')) || /^I\b/.test(en);
+    const out = applyCase(sentenceStart ? t.s : (/^\p{Lu}/u.test(t.s) && !sentenceStart ? t.s.toLowerCase() : t.s), en, keep);
+    sentenceStart = false;
+    const how = r.kind === 'contr' ? 'comp' : r.chain.length ? 'der' : r.kind;
+    html.push(`<span class="${how === 'der' ? 'der' : ''}">${esc(out)}</span>`); plain.push(out);
+    let detail = '';
+    if (r.kind === 'contr') detail = 'Contraction: ' + r.parts.join(' + ');
+    else if (r.chain.length) detail = r.chain.slice().reverse().map(c => `${c.suf.endsWith('-') ? c.suf : '-' + c.suf} (${TAG_LABEL[c.tag] || c.tag})`).join(', ') + ' on ' + (r.entry ? r.entry.h : r.chain[0].root);
+    else if (r.kind === 'gram') detail = 'Grammar: ' + r.src;
+    else if (r.kind === 'comp') detail = 'Compound word: ' + r.raw;
+    else if (r.entry) detail = r.entry.g;
+    if (r.alts && r.alts.length) detail += ' · also: ' + [...new Set(r.alts)].slice(0, 4).join(', ');
+    rows.push({src:t.s, out, how, detail, entry:r.entry});
+  }
+  return {html:html.join(''), text:plain.join(''), rows, found, total};
+}
+
+/* ------------------------------------------------------------ dictionary */
+function search(q){
+  const nq = norm(q.trim()); if (!nq) return [];
+  const words = nq.split(/\s+/);
+  const res = [];
+  for (const e of E){
+    let s = 0, why = '';
+    if (e.nh === nq){ s = 100 + (e.h.toLowerCase() === q.trim().toLowerCase() ? 5 : 0); why = 'da'; }
+    else if (e.nen.includes(nq)){ s = 92 - e.nen.indexOf(nq); why = 'en'; }
+    else if (e.nh.startsWith(nq)){ s = 75 - Math.min(10, e.nh.length - nq.length) * 0.5; why = 'da'; }
+    else if (e.nen.some(t => t.startsWith(nq) || t.split(/[\s-]+/).includes(nq))){ s = 62; why = 'en'; }
+    else if (nq.length >= 2 && e.nh.includes(nq)){ s = 45; why = 'da'; }
+    else if (nq.length >= 3 && e.nen.some(t => t.includes(nq))){ s = 38; why = 'en'; }
+    else if (nq.length >= 3){
+      const defs = norm(e.s.map(x => x.def).join(' '));
+      if (words.every(w => new RegExp('\\b' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(defs))){ s = 15; why = 'def'; }
+    }
+    if (s) res.push({e, s, why});
+  }
+  res.sort((a, b) => b.s - a.s || a.e.nh.localeCompare(b.e.nh));
+  return res;
+}
+function hl(text, q){
+  if (!q) return esc(text);
+  const nt = norm(text), nq = norm(q.trim()); const i = nq ? nt.indexOf(nq) : -1;
+  if (i < 0) return esc(text);
+  return esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + nq.length)) + '</mark>' + esc(text.slice(i + nq.length));
+}
+const store = {
+  get(key, fallback) {
+    try { const raw = localStorage.getItem(key); return raw == null ? fallback : JSON.parse(raw); }
+    catch (e) { return fallback; }
+  },
+  set(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+    catch (e) { return false; }
+  }
+};
+function favList(){ return store.get('daihesi.favs', []); }
+function isFav(e){ const n = e.nh; return favList().some(h => norm(h) === n); }
+function findEntry(word){ const n = norm(word); return E.find(e => e.nh === n) || null; }
+function entryPlain(e){
+  const senses = e.s.map(s => (s.pos ? s.pos + '. ' : '') + s.def).join('\n');
+  return e.h + (e.p ? ' [' + e.p + ']' : '') + '\n' + senses + '\nEnglish: ' + e.g;
+}
+function wordHash(h){ return '#word=' + encodeURIComponent(h); }
+let curLetter = 'A';
+let curPos = '';
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const POS_ORDER = ['noun','verb','adjective','adverb','numeral','proper noun','pronoun','preposition','conjunction','determiner','interjection','article','helping verb','past participle','past','present','contraction'];
+function labelPos(p){ return p ? p.charAt(0).toUpperCase() + p.slice(1) : 'All'; }
+function posMatch(e){
+  if (curPos === 'saved') return isFav(e);
+  if (!curPos) return true;
+  return e.pos.indexOf(curPos) !== -1;
+}
+function entryArticle(e, q, target){
+  const senses = e.s.map(s => '<p class="sense">' + (s.pos ? '<span class="pos">' + esc(s.pos) + '</span> ' : '') + hl(s.def, q && q.length >= 3 ? q : '') + '</p>').join('');
+  const saved = isFav(e);
+  return '<article class="entry' + (target ? ' target' : '') + '" id="entry-' + e.id + '">' +
+    '<div class="entry-top"><div class="head"><h3 class="hw">' + hl(e.h, q) + '</h3>' +
+    (e.p ? '<span class="pron">[' + esc(e.p) + ']</span>' : '') + '</div>' +
+    '<div class="entry-actions">' +
+    '<button type="button" class="btn tiny" data-act="copy" data-id="' + e.id + '">Copy</button>' +
+    '<button type="button" class="btn tiny" data-act="fav" data-id="' + e.id + '" aria-pressed="' + saved + '">' + (saved ? 'Saved' : 'Save') + '</button>' +
+    '<button type="button" class="btn tiny" data-act="link" data-id="' + e.id + '">Link</button>' +
+    '<button type="button" class="btn tiny" data-act="use" data-id="' + e.id + '">Translate</button>' +
+    '</div></div>' + senses +
+    '<p class="gloss"><small>English</small>' + hl(e.g, q) + '</p></article>';
+}
+function renderPos(){
+  const bar = $('#posbar');
+  if (!bar.dataset.ready){
+    const counts = new Map();
+    E.forEach(e => e.pos.forEach(p => counts.set(p, (counts.get(p) || 0) + 1)));
+    const known = POS_ORDER.filter(p => counts.has(p));
+    const rest = [...counts.keys()].filter(p => known.indexOf(p) === -1).sort();
+    const btn = (id, label) => '<button type="button" class="chip" data-pos="' + esc(id) + '">' + esc(label) + '</button>';
+    bar.innerHTML = btn('', 'All') + btn('saved', 'Saved') + known.concat(rest).map(p => btn(p, labelPos(p))).join('');
+    bar.dataset.ready = '1';
+  }
+  bar.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pos === curPos)));
+  const savedBtn = bar.querySelector('[data-pos="saved"]');
+  if (savedBtn) savedBtn.textContent = 'Saved' + (favList().length ? ' ' + favList().length : '');
+}
+function renderLetters(){
+  const counts = {};
+  E.forEach(e => { if (posMatch(e)) counts[e.l] = (counts[e.l] || 0) + 1; });
+  const bar = $('#letters');
+  const typing = $('#q').value.trim();
+  if (bar.childElementCount !== LETTERS.length){
+    bar.innerHTML = LETTERS.map(L => '<button type="button" data-l="' + L + '">' + L + '</button>').join('');
+  }
+  bar.querySelectorAll('button').forEach(b => {
+    const n = counts[b.dataset.l] || 0;
+    b.disabled = !n;
+    b.setAttribute('aria-pressed', String(!typing && b.dataset.l === curLetter));
+    b.title = n + (n === 1 ? ' entry' : ' entries');
+  });
+}
+function renderRecent(){
+  const slot = $('#recent');
+  const list = store.get('daihesi.recent', []);
+  if (!list.length){ slot.hidden = true; slot.innerHTML = ''; return; }
+  slot.hidden = false;
+  slot.innerHTML = '<span class="recent-label">Recent</span>' +
+    list.map(q => '<button type="button" class="btn tiny" data-recent="' + esc(q) + '">' + esc(q) + '</button>').join('') +
+    '<button type="button" class="btn tiny ghost" data-act="clear-recent">Clear</button>';
+}
+function renderSaved(){
+  const slot = $('#saved-slot');
+  const list = favList();
+  if (!list.length){ slot.hidden = true; slot.innerHTML = ''; return; }
+  slot.hidden = false;
+  slot.innerHTML = '<div class="saved"><h2>Saved words</h2><div class="chips">' + list.map(h => {
+    const e = findEntry(h);
+    const label = e ? e.h : h;
+    return '<button type="button" class="btn tiny" data-recent="' + esc(label) + '">' + esc(label) + '</button>';
+  }).join('') + '</div></div>';
+}
+function showEmpty(html){
+  const el = $('#empty');
+  if (!html){ el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  el.innerHTML = html;
+}
+function renderDict(){
+  const q = $('#q').value;
+  const trimmed = q.trim();
+  $('#clear-q').hidden = !trimmed;
+  renderLetters();
+  renderPos();
+  renderSaved();
+  renderRecent();
+  if (trimmed){
+    $('#wotd-slot').hidden = true;
+    const rows = search(q).filter(x => posMatch(x.e));
+    const nq = norm(trimmed);
+    const shown = rows.slice(0, 80);
+    const posName = curPos === 'saved' ? 'saved' : (curPos ? labelPos(curPos).toLowerCase() : '');
+    $('#status').textContent = rows.length
+      ? rows.length + ' result' + (rows.length === 1 ? '' : 's') + ' for “' + trimmed + '”' + (posName ? ' · ' + posName : '') + (rows.length > 80 ? ' — showing the best 80' : '')
+      : 'No entries match “' + trimmed + '”' + (posName ? ' in ' + posName : '') + '.';
+    $('#results').innerHTML = shown.map(x => entryArticle(x.e, q, x.e.nh === nq)).join('');
+    if (!rows.length){
+      showEmpty('<p>No entries match “' + esc(trimmed) + '”' + (curPos ? ' with this filter' : '') + '.</p><div class="actions">' +
+        '<button type="button" class="btn" data-empty="search">Clear search</button>' +
+        (curPos ? '<button type="button" class="btn" data-empty="pos">Show every part of speech</button>' : '') +
+        '</div>');
+    } else showEmpty('');
+  } else {
+    $('#wotd-slot').hidden = false;
+    const list = E.filter(e => e.l === curLetter && posMatch(e)).sort((a, b) => a.nh.localeCompare(b.nh));
+    const scope = curPos === 'saved' ? 'saved ' : (curPos ? labelPos(curPos).toLowerCase() + ' ' : '');
+    $('#status').textContent = list.length + ' ' + scope + 'entr' + (list.length === 1 ? 'y' : 'ies') + ' under ' + curLetter + ' · ' + E.length + ' in the lexicon';
+    $('#results').innerHTML = list.map(e => entryArticle(e, '')).join('');
+    if (!list.length){
+      const savedNote = curPos === 'saved'
+        ? '<p>No saved words under ' + curLetter + '. Save an entry, or choose another letter. Saved words stay on this device.</p>'
+        : '<p>No ' + (curPos ? labelPos(curPos).toLowerCase() + 's' : 'entries') + ' under ' + curLetter + '.</p>';
+      showEmpty(savedNote + (curPos ? '<div class="actions"><button type="button" class="btn" data-empty="pos">Show every part of speech</button></div>' : ''));
+    } else showEmpty('');
+  }
+  syncFavButtons();
+}
+function wotd(random){
+  const pool = E.filter(e => e.en.length && e.s.some(s => s.def));
+  let idx;
+  if (random){
+    idx = Math.floor(Math.random() * pool.length);
+    if (pool.length > 1 && pool[idx].id === wotd.current) idx = (idx + 1) % pool.length;
+  } else {
+    const d = new Date(), key = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    let h = 2166136261;
+    for (const c of key){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); }
+    idx = (h >>> 0) % pool.length;
+  }
+  const e = pool[idx];
+  wotd.current = e.id;
+  const saved = isFav(e);
+  $('#wotd-slot').innerHTML = '<div class="wotd"><div class="wotd-top"><div><div class="label">' + (random ? 'Another word' : 'Word of the day') + '</div>' +
+    '<div class="head"><h3 class="hw">' + esc(e.h) + '</h3>' + (e.p ? '<span class="pron">[' + esc(e.p) + ']</span>' : '') + '</div></div>' +
+    '<div class="entry-actions"><button type="button" class="btn tiny" id="wotd-new">Another</button>' +
+    '<button type="button" class="btn tiny" data-act="copy" data-id="' + e.id + '">Copy</button>' +
+    '<button type="button" class="btn tiny" data-act="fav" data-id="' + e.id + '" aria-pressed="' + saved + '">' + (saved ? 'Saved' : 'Save') + '</button>' +
+    '<button type="button" class="btn tiny" data-act="link" data-id="' + e.id + '">Link</button></div></div>' +
+    e.s.map(s => '<p class="sense">' + (s.pos ? '<span class="pos">' + esc(s.pos) + '</span> ' : '') + esc(s.def) + '</p>').join('') +
+    '<p class="gloss"><small>English</small>' + esc(e.g) + '</p></div>';
+}
+function remember(q){
+  const t = String(q || '').trim();
+  if (norm(t).length < 2) return;
+  const exact = findEntry(t);
+  const shown = exact ? exact.h : t;
+  const list = store.get('daihesi.recent', []).filter(x => norm(x) !== norm(shown));
+  list.unshift(shown);
+  store.set('daihesi.recent', list.slice(0, 8));
+  renderRecent();
+}
+function syncFavButtons(){
+  document.querySelectorAll('[data-act="fav"]').forEach(b => {
+    const entry = entryById(b.dataset.id);
+    if (!entry) return;
+    const on = isFav(entry);
+    b.setAttribute('aria-pressed', String(on));
+    b.textContent = on ? 'Saved' : 'Save';
+  });
+}
+function toggleFav(e){
+  const list = favList();
+  const i = list.findIndex(h => norm(h) === e.nh);
+  const saved = i < 0;
+  if (saved) list.unshift(e.h); else list.splice(i, 1);
+  if (!store.set('daihesi.favs', list.slice(0, 300))) toast('Could not save on this browser');
+  else toast(saved ? 'Saved ' + e.h : 'Removed ' + e.h);
+  renderDict();
+  syncFavButtons();
+}
+let dir = 'en-da';
+const EXAMPLES = {'en-da':['We stand together', 'The people will defend the island', 'I love my family', 'We are united', 'They will remember the empire'],
+  'da-en':["Kundilra vi'parna", "Vi'jeor Agantid", "Ei'jad Kälalön", "Tei'bveinu Zácetecor el Rïkich", "Ole Erünnau"]};
+function runTranslate(){
+  const text = $('#tin').value;
+  const r = dir === 'en-da' ? translateEnDa(text) : translateDaEn(text);
+  $('#tout').innerHTML = r.html || '<span class="detail">The translation will appear here.</span>';
+  $('#tout').dataset.plain = r.text || '';
+  $('#tstats').textContent = r.total ? r.found + ' of ' + r.total + ' word' + (r.total === 1 ? '' : 's') + ' translated' : '';
+  const label = {dict:'dictionary', gram:'grammar', comp:'compound', der:'derived', miss:'not found', contr:'contraction'};
+  $('#gloss').innerHTML = r.rows.map(x => '<tr><td>' + esc(x.src) + '</td><td>' +
+    (x.entry ? '<button type="button" class="linkish" data-look="' + esc(x.entry.h) + '">' + esc(x.out) + '</button>' : esc(x.out)) +
+    '</td><td><span class="how ' + esc(x.how) + '">' + esc(label[x.how] || x.how) + '</span></td><td class="detail">' + esc(x.detail) + '</td></tr>').join('') ||
+    '<tr><td colspan="4" class="detail">Each word, and how it was translated, will be listed here.</td></tr>';
+  return r;
+}
+function setDir(d, text){
+  dir = d;
+  const en = d === 'en-da';
+  $('#lang-from').textContent = $('#in-label').textContent = en ? 'English' : 'Daihesi';
+  $('#lang-to').textContent = $('#out-label').textContent = en ? 'Daihesi' : 'English';
+  $('#tin').setAttribute('aria-label', (en ? 'English' : 'Daihesi') + ' text to translate');
+  $('#swap').setAttribute('aria-label', 'Swap direction. Currently ' + (en ? 'English to Daihesi' : 'Daihesi to English'));
+  $('#examples').innerHTML = '<span class="try">Try</span>' + EXAMPLES[d].map(x => '<button type="button" class="btn tiny" data-ex="' + esc(x) + '">' + esc(x) + '</button>').join('');
+  if (text != null) $('#tin').value = text;
+  runTranslate();
+}
+let toastTimer;
+function toast(msg){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1600);
+}
+function copyText(s, okMsg){
+  if (!s) return toast('Nothing to copy');
+  const done = () => toast(okMsg || 'Copied');
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = s; ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (err) { toast('Copy failed'); }
+    ta.remove();
+  };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(s).then(done, fallback);
+  else fallback();
+}
+function renderGrammar(){
+  const P = D.phonology, A = D.affixes;
+  const secs = [];
+  secs.push(['pron', 'Pronunciation',
+    '<div class="cols2"><div class="gblock"><h3>Vowels</h3><p class="detail">' + esc(P.vowelLetters) + '</p>' +
+    P.vowelNotes.map(n => '<p class="detail">' + esc(n) + '</p>').join('') +
+    '<div class="tablewrap"><table><thead><tr><th>Letter</th><th>IPA</th><th>Sound</th></tr></thead><tbody>' +
+    P.vowels.map(v => '<tr><td class="dai">' + esc(v.v) + '</td><td class="mono">' + esc(v.ipa) + '</td><td>' + esc(v.d) + '</td></tr>').join('') +
+    '</tbody></table></div></div><div class="gblock"><h3>Vowel rules</h3>' + P.rules.map(r => '<p>' + esc(r) + '</p>').join('') +
+    '<h3>Consonants</h3><p class="dai">' + esc(P.consonants) + '</p><h3>Reading the guides</h3><p class="detail">Each entry shows a respelling in brackets, for example Abete [ah-beh-teh]. The first syllable is stressed.</p></div></div>']);
+  const affRows = list => list.map(a => '<tr><td class="mono">' + esc(a.a) + '</td><td>' + esc(a.d) + '</td><td>' + esc(a.en) + '</td></tr>').join('');
+  secs.push(['aff', 'Affixes', '<div class="gblock"><h3>Suffixes</h3><div class="tablewrap"><table><thead><tr><th>Suffix</th><th>Meaning</th><th>English</th></tr></thead><tbody>' + affRows(A.suffixes) + '</tbody></table></div>' +
+    '<h3>Prefixes</h3><div class="tablewrap"><table><thead><tr><th>Prefix</th><th>Meaning</th><th>English</th></tr></thead><tbody>' + affRows(A.prefixes) + '</tbody></table></div>' +
+    A.notes.map(n => '<p class="detail">' + esc(n) + '</p>').join('') + '</div>']);
+  secs.push(['gram', 'Grammar', '<div class="cols2">' + D.grammar.map(g => '<div class="gblock">' + (g.t ? '<h3>' + esc(g.t) + '</h3>' : '') + g.lines.map(l => '<p>' + esc(l) + '</p>').join('') + '</div>').join('') + '</div>']);
+  secs.push(['comp', 'Compound words', '<div class="gblock"><p class="detail">Contractions and joined words. The translator recognises these in both directions.</p><div class="tablewrap"><table><thead><tr><th>Daihesi</th><th>Meaning</th></tr></thead><tbody>' +
+    D.compounds.map(c => '<tr><td class="dai">' + esc(c.da.join(' | ')) + '</td><td>' + esc(c.raw.split(' — ').slice(1).join(' — ')) + '</td></tr>').join('') +
+    '</tbody></table></div></div>']);
+  $('#gnav').innerHTML = secs.map(s => '<button type="button" class="btn tiny" data-go="' + s[0] + '">' + esc(s[1]) + '</button>').join('');
+  $('#gbody').innerHTML = secs.map(s => '<section class="gsec" id="g-' + s[0] + '" tabindex="-1"><h2>' + esc(s[1]) + '</h2>' + s[2] + '</section>').join('');
+}
+function show(view){
+  document.querySelectorAll('#tabs button').forEach(b => {
+    const on = b.dataset.view === view;
+    b.setAttribute('aria-selected', String(on));
+    b.tabIndex = on ? 0 : -1;
+  });
+  document.querySelectorAll('section.view').forEach(s => {
+    const on = s.id === 'view-' + view;
+    s.classList.toggle('active', on);
+    if (on) s.removeAttribute('hidden'); else s.setAttribute('hidden', '');
+  });
+}
+function sameHash(next){
+  let cur = location.hash;
+  try { return decodeURIComponent(cur) === decodeURIComponent(next); }
+  catch (e) { return cur === next; }
+}
+function writeHash(hash, mode){
+  if (hash.charAt(0) !== '#') hash = '#' + hash;
+  if (sameHash(hash)) return;
+  if (mode === 'push') history.pushState(null, '', hash);
+  else history.replaceState(null, '', hash);
+}
+function readHash(){
+  let h = location.hash.replace(/^#/, '');
+  try { h = decodeURIComponent(h); } catch (e) {}
+  if (!h) return {view:'dictionary'};
+  if (h.indexOf('word=') === 0) return {view:'dictionary', word:h.slice(5)};
+  if (h.indexOf('letter=') === 0){
+    const L = h.slice(7).toUpperCase();
+    return {view:'dictionary', letter:/^[A-Z]$/.test(L) ? L : 'A'};
+  }
+  if (h === 'grammar' || h.indexOf('grammar/') === 0) return {view:'grammar', section:(h.split('/')[1] || '')};
+  if (h === 'translator' || h === 'dictionary') return {view:h};
+  return {view:'dictionary'};
+}
+function jumpGrammar(id){
+  const el = document.getElementById('g-' + id);
+  if (!el) return;
+  document.querySelectorAll('#gnav button').forEach(b => b.setAttribute('aria-current', b.dataset.go === id ? 'true' : 'false'));
+  el.focus({preventScroll:true});
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  el.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+}
+function applyHash(){
+  const route = readHash();
+  show(route.view);
+  if (route.view === 'dictionary'){
+    if (route.word){
+      const exact = findEntry(route.word);
+      $('#q').value = exact ? exact.h : route.word;
+      curPos = '';
+      renderDict();
+    } else if (route.letter){
+      curLetter = route.letter;
+      $('#q').value = '';
+      renderDict();
+    } else renderDict();
+  } else if (route.view === 'grammar' && route.section){
+    requestAnimationFrame(() => jumpGrammar(route.section));
+  }
+}
+function openWord(word){
+  const exact = findEntry(word);
+  const shown = exact ? exact.h : word;
+  show('dictionary');
+  $('#q').value = shown;
+  curPos = '';
+  remember(shown);
+  renderDict();
+  writeHash(exact ? wordHash(exact.h) : '#word=' + encodeURIComponent(word), 'push');
+  window.scrollTo(0, 0);
+}
+function entryById(id){ return E[Number(id)] || null; }
+function effectiveTheme(){
+  const set = document.documentElement.getAttribute('data-theme');
+  if (set === 'light' || set === 'dark') return set;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+function paintThemeButton(){
+  const dark = effectiveTheme() === 'dark';
+  const b = $('#theme');
+  b.textContent = dark ? 'Day edition' : 'Evening edition';
+  b.setAttribute('aria-pressed', String(dark));
+  b.setAttribute('aria-label', dark ? 'Switch to the day edition' : 'Switch to the evening edition');
+}
+document.body.addEventListener('click', e => {
+  const tab = e.target.closest('#tabs button[data-view]');
+  if (tab){
+    const view = tab.dataset.view;
+    show(view);
+    if (view === 'dictionary') writeHash($('#q').value.trim() ? '#dictionary' : '#letter=' + curLetter, 'push');
+    else writeHash('#' + view, 'push');
+    return;
+  }
+  const letter = e.target.closest('#letters button[data-l]');
+  if (letter && !letter.disabled){
+    curLetter = letter.dataset.l;
+    $('#q').value = '';
+    renderDict();
+    writeHash('#letter=' + curLetter, 'push');
+    return;
+  }
+  const pos = e.target.closest('#posbar button[data-pos]');
+  if (pos){ curPos = pos.dataset.pos; renderDict(); return; }
+  const recent = e.target.closest('[data-recent]');
+  if (recent){ openWord(recent.dataset.recent); return; }
+  const ex = e.target.closest('[data-ex]');
+  if (ex){ $('#tin').value = ex.dataset.ex; runTranslate(); $('#tin').focus(); return; }
+  const look = e.target.closest('[data-look]');
+  if (look){ openWord(look.dataset.look); return; }
+  const go = e.target.closest('[data-go]');
+  if (go){ jumpGrammar(go.dataset.go); writeHash('#grammar/' + go.dataset.go, 'push'); return; }
+  const empty = e.target.closest('[data-empty]');
+  if (empty){
+    if (empty.dataset.empty === 'search'){ $('#q').value = ''; writeHash('#letter=' + curLetter, 'replace'); renderDict(); $('#q').focus(); }
+    if (empty.dataset.empty === 'pos'){ curPos = ''; renderDict(); }
+    return;
+  }
+  if (e.target.closest('#wotd-new')){ wotd(true); toast('Another word'); return; }
+  const act = e.target.closest('[data-act]');
+  if (!act) return;
+  if (act.dataset.act === 'clear-recent'){ store.set('daihesi.recent', []); renderRecent(); toast('Recent searches cleared'); return; }
+  const entry = entryById(act.dataset.id);
+  if (!entry) return;
+  if (act.dataset.act === 'copy') copyText(entryPlain(entry), 'Entry copied');
+  else if (act.dataset.act === 'fav') toggleFav(entry);
+  else if (act.dataset.act === 'link'){
+    writeHash(wordHash(entry.h), 'push');
+    copyText(location.origin + location.pathname + location.search + wordHash(entry.h), 'Link copied');
+  } else if (act.dataset.act === 'use'){
+    show('translator');
+    writeHash('#translator', 'push');
+    setDir('da-en', entry.h);
+    toast('Opened in the translator');
+    $('#tin').focus();
+  }
+});
+$('#tabs').addEventListener('keydown', e => {
+  if (['ArrowLeft','ArrowRight','Home','End'].indexOf(e.key) === -1) return;
+  const tabs = [...document.querySelectorAll('#tabs button')];
+  let i = tabs.findIndex(t => t.getAttribute('aria-selected') === 'true');
+  if (e.key === 'ArrowRight') i = (i + 1) % tabs.length;
+  else if (e.key === 'ArrowLeft') i = (i + tabs.length - 1) % tabs.length;
+  else if (e.key === 'Home') i = 0;
+  else i = tabs.length - 1;
+  e.preventDefault();
+  tabs[i].focus();
+  tabs[i].click();
+});
+let qt;
+$('#q').addEventListener('input', () => {
+  clearTimeout(qt);
+  qt = setTimeout(() => {
+    renderDict();
+    const q = $('#q').value.trim();
+    writeHash(q ? '#dictionary' : '#letter=' + curLetter, 'replace');
+  }, 50);
+});
+$('#q').addEventListener('keydown', e => { if (e.key === 'Enter'){ remember($('#q').value); } });
+$('#q').addEventListener('change', () => remember($('#q').value));
+$('#clear-q').addEventListener('click', () => {
+  $('#q').value = '';
+  renderDict();
+  writeHash('#letter=' + curLetter, 'replace');
+  $('#q').focus();
+  toast('Search cleared');
+});
+let tt;
+$('#tin').addEventListener('input', () => { clearTimeout(tt); tt = setTimeout(runTranslate, 80); });
+$('#swap').addEventListener('click', () => {
+  const out = $('#tout').dataset.plain || '';
+  const next = dir === 'en-da' ? 'da-en' : 'en-da';
+  const text = out.trim() ? out : $('#tin').value;
+  setDir(next, text);
+  toast(next === 'en-da' ? 'Translating English to Daihesi' : 'Translating Daihesi to English');
+});
+$('#clear').addEventListener('click', () => { $('#tin').value = ''; runTranslate(); $('#tin').focus(); toast('Cleared'); });
+$('#copy').addEventListener('click', () => copyText($('#tout').dataset.plain || '', 'Copied'));
+document.addEventListener('keydown', e => {
+  const tag = e.target && e.target.tagName;
+  const typing = tag === 'INPUT' || tag === 'TEXTAREA' || (e.target && e.target.isContentEditable);
+  if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && !typing){
+    e.preventDefault();
+    show('dictionary');
+    const h = location.hash;
+    if (h && h !== '#dictionary' && h.indexOf('#letter=') !== 0 && h.indexOf('#word=') !== 0) writeHash('#dictionary', 'push');
+    $('#q').focus();
+    $('#q').select();
+  }
+  if (e.key === 'Escape' && e.target === $('#q')){
+    if ($('#q').value){ $('#q').value = ''; renderDict(); writeHash('#letter=' + curLetter, 'replace'); }
+    else $('#q').blur();
+  }
+});
+$('#theme').addEventListener('click', () => {
+  const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  store.set('daihesi.theme', next);
+  paintThemeButton();
+  toast(next === 'dark' ? 'Evening edition' : 'Day edition');
+});
+window.addEventListener('hashchange', applyHash);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (!document.documentElement.getAttribute('data-theme')) paintThemeButton();
+});
+renderGrammar();
+setDir('en-da');
+wotd(false);
+paintThemeButton();
+applyHash();
+$('#foot').textContent = E.length + ' entries from the “' + D.meta.title + '” document · built ' + D.meta.built + ' · works offline';
+window.Daihesi = {search, translateEnDa, translateDaEn, data:D, setDir, show, findEntry};
+})();
+</script>
+</body>
+</html>
